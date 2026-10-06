@@ -30,6 +30,7 @@ import {
   useParams,
 } from "react-router-dom";
 import { auth, db, isFirebaseConfigured } from "./firebase.ts";
+import phonePreview from "../assets/phone-preview-DOP5Nxe_.png";
 
 const defaultCover = "/ReadJourney/assets/book-C2aK6_m4.jpg";
 const booksPath = (uid) => collection(db, "users", uid, "books");
@@ -256,6 +257,15 @@ function AuthPage({ mode, notify }) {
             </div>
           </div>
         </section>
+        <aside className="welcome-art" aria-hidden="true">
+          <img
+            className="phone-preview"
+            src={phonePreview}
+            alt=""
+            width="411"
+            height="656"
+          />
+        </aside>
       </main>
     );
 
