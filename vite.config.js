@@ -25,6 +25,15 @@ export default defineConfig({
         notFound: resolve("404.html"),
       },
       output: {
+        entryFileNames: (chunkInfo) => {
+          const name = chunkInfo.name;
+          if (name === "firebase-vendor") return "assets/firebase-vendor.js";
+          if (name === "router") return "assets/router.js";
+          if (name === "react-vendor") return "assets/react-vendor.js";
+          return "assets/main.js";
+        },
+        chunkFileNames: "assets/[name].js",
+        assetFileNames: "assets/[name][extname]",
         manualChunks(id) {
           if (
             id.includes("/node_modules/@firebase/") ||
