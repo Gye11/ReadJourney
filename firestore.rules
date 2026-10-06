@@ -1,0 +1,81 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function ownsUserData(userId) {
+      return request.auth != null && request.auth.uid == userId;
+    }
+
+    function validProfile(data) {
+      return data.keys().hasOnly(['displayName', 'email', 'createdAt'])
+        && data.displayName is string
+        && data.email is string;
+    }
+
+    function validBook(data) {
+      return data.keys().hasOnly([
+          'title', 'author', 'totalPages', 'coverUrl', 'catalogId',
+          'status', 'currentPage', 'createdAt', 'activeReadingId'
+        ])
+        && data.title is string
+        && data.author is string
+        && data.totalPages is int
+        && data.totalPages > 0
+        && data.currentPage is int
+        && data.currentPage >= 0
+        && data.currentPage <= data.totalPages
+        && data.status in ['unread', 'reading', 'finished']
+        && data.coverUrl is string
+        && (!('catalogId' in data) || data.catalogId is string)
+        && (!('activeReadingId' in data) || data.activeReadingId is string);
+    }
+
+    function validReadingStart(data) {
+      return data.keys().hasOnly([
+          'startPage', 'startedAt', 'createdAt',
+          'endPage', 'pagesRead', 'durationMinutes', 'finishedAt'
+        ])
+        && data.startPage is int
+        && data.startPage > 0
+        && data.startedAt is timestamp
+        && data.createdAt is timestamp;
+    }
+
+    function validFinishedReading(data) {
+      return validReadingStart(data)
+        && data.endPage is int
+        && data.endPage >= data.startPage
+        && data.pagesRead is int
+        && data.pagesRead == data.endPage - data.startPage
+        && data.durationMinutes is int
+        && data.durationMinutes > 0
+        && data.finishedAt is timestamp;
+    }
+
+    match /users/{userId} {
+      allow read: if ownsUserData(userId);
+      allow create, update: if ownsUserData(userId) && validProfile(request.resource.data);
+      allow delete: if false;
+
+      match /books/{bookId} {
+        allow read, delete: if ownsUserData(userId);
+        allow create, update: if ownsUserData(userId) && validBook(request.resource.data);
+
+        match /readings/{readingId} {
+          allow read, delete: if ownsUserData(userId);
+          allow create: if ownsUserData(userId) && validReadingStart(request.resource.data);
+          allow update: if ownsUserData(userId) && validFinishedReading(request.resource.data);
+        }
+      }
+    }
+
+    match /catalog/{bookId} {
+      allow read: if request.auth != null;
+      allow write: if false;
+    }
+
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
