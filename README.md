@@ -38,7 +38,7 @@ The production build is written to `dist/` and uses `/Read.Journey/` as its depl
 
 The workflow at `.github/workflows/deploy.yml` builds and deploys `dist/` whenever changes are pushed to `main`; it can also be started manually from the repository's Actions tab. In repository Settings → Pages, set the build/deployment source to **GitHub Actions**.
 
-Before the first deployment, add these six `VITE_FIREBASE_*` values under Settings → Secrets and variables → Actions → Variables (or Secrets): `API_KEY`, `AUTH_DOMAIN`, `PROJECT_ID`, `STORAGE_BUCKET`, `MESSAGING_SENDER_ID`, and `APP_ID`. The workflow accepts either repository variables or secrets. Firebase web-app configuration is included in the public client bundle; never add a Firebase service-account key here. Add `gizemnuravci.github.io` (or the repository's actual Pages hostname) to Firebase Authentication → Settings → Authorized domains.
+Before the first deployment, add these six `VITE_FIREBASE_*` values under Settings → Secrets and variables → Actions → Variables (or Secrets): `API_KEY`, `AUTH_DOMAIN`, `PROJECT_ID`, `STORAGE_BUCKET`, `MESSAGING_SENDER_ID`, and `APP_ID`. The workflow accepts either repository variables or secrets. Firebase web-app configuration is included in the public client bundle; never add a Firebase service-account key here. This repository is owned by `Gye11`, so its project Pages URL will be `https://gye11.github.io/ReadJourney/`. Add `gye11.github.io` to Firebase Authentication → Settings → Authorized domains.
 
 ## Firebase data model
 
