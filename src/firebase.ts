@@ -13,17 +13,13 @@ const firebaseConfig = {
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
 };
 
-const missingConfig = Object.entries(firebaseConfig)
-  .filter(([, value]) => !value)
-  .map(([name]) => name);
+export const isFirebaseConfigured =
+  Object.values(firebaseConfig).every(Boolean);
 
-if (missingConfig.length > 0) {
-  throw new Error(
-    `Missing Firebase configuration: ${missingConfig.join(", ")}`,
-  );
-}
-
-export const app =
-  getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
-export const auth = getAuth(app);
-export const db = getFirestore(app);
+export const app = isFirebaseConfigured
+  ? getApps().length > 0
+    ? getApp()
+    : initializeApp(firebaseConfig)
+  : null;
+export const auth = app ? getAuth(app) : null;
+export const db = app ? getFirestore(app) : null;

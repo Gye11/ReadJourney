@@ -29,7 +29,7 @@ import {
   useNavigate,
   useParams,
 } from "react-router-dom";
-import { auth, db } from "./firebase.ts";
+import { auth, db, isFirebaseConfigured } from "./firebase.ts";
 
 const defaultCover = "/ReadJourney/assets/book-C2aK6_m4.jpg";
 const booksPath = (uid) => collection(db, "users", uid, "books");
@@ -53,14 +53,18 @@ function App() {
   const [authReady, setAuthReady] = useState(false);
   const [toast, setToast] = useState("");
 
-  useEffect(
-    () =>
-      onAuthStateChanged(auth, (nextUser) => {
-        setUser(nextUser);
-        setAuthReady(true);
-      }),
-    [],
-  );
+  useEffect(() => {
+    if (!auth) {
+      setUser(null);
+      setAuthReady(true);
+      return undefined;
+    }
+
+    return onAuthStateChanged(auth, (nextUser) => {
+      setUser(nextUser);
+      setAuthReady(true);
+    });
+  }, []);
 
   const notify = useCallback((message) => {
     setToast(message);
@@ -76,8 +80,17 @@ function App() {
       </main>
     );
 
+  const firebaseUnavailable = !isFirebaseConfigured;
+
   return (
     <>
+      {firebaseUnavailable && (
+        <div className="firebase-warning panel" role="status">
+          Firebase is not configured for this deployment yet. Add the
+          VITE_FIREBASE_* values to the GitHub Actions environment or local .env
+          file and rebuild.
+        </div>
+      )}
       <Routes>
         <Route
           path="/"
@@ -183,6 +196,12 @@ function AuthPage({ mode, notify }) {
 
   async function submit(event) {
     event.preventDefault();
+    if (!auth || !db) {
+      notify(
+        "Firebase is not configured yet. Add the app configuration and rebuild the project.",
+      );
+      return;
+    }
     const data = new FormData(event.currentTarget);
     const name = String(data.get("name") || "").trim();
     const email = String(data.get("email") || "").trim();
@@ -373,6 +392,11 @@ function useUserBooks(user) {
   const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
   const refresh = useCallback(async () => {
+    if (!user?.uid || !db) {
+      setBooks([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
       const result = await getDocs(
@@ -382,10 +406,15 @@ function useUserBooks(user) {
     } finally {
       setLoading(false);
     }
-  }, [user.uid]);
+  }, [user?.uid]);
   useEffect(() => {
+    if (!db || !user?.uid) {
+      setBooks([]);
+      setLoading(false);
+      return;
+    }
     refresh().catch(() => setLoading(false));
-  }, [refresh]);
+  }, [refresh, user?.uid]);
   return { books, loading, refresh };
 }
 
@@ -399,7 +428,15 @@ function Recommended({ user, notify }) {
   const { books, refresh: refreshLibrary } = useUserBooks(user);
   const [busyId, setBusyId] = useState("");
 
+  const firebaseUnavailable = !db;
+
   useEffect(() => {
+    if (!db) {
+      setCatalog([]);
+      setLoading(false);
+      return;
+    }
+
     getDocs(query(collection(db, "catalog"), limit(60)))
       .then((result) =>
         setCatalog(
@@ -409,6 +446,20 @@ function Recommended({ user, notify }) {
       .catch((error) => notify(errorText(error)))
       .finally(() => setLoading(false));
   }, [notify]);
+
+  if (firebaseUnavailable) {
+    return (
+      <EmptyState
+        title="Firebase not configured"
+        text="This deployment is missing Firebase keys. Add the project values, then redeploy."
+        action={
+          <Link className="button primary" to="/">
+            Back home
+          </Link>
+        }
+      />
+    );
+  }
 
   const owned = new Set(books.map((book) => book.catalogId).filter(Boolean));
   const filtered = catalog.filter((book) => {
@@ -631,10 +682,25 @@ function Recommended({ user, notify }) {
 function Library({ user, notify }) {
   const { books, loading, refresh } = useUserBooks(user);
   const [filter, setFilter] = useState("all");
+  const firebaseUnavailable = !db;
   const [showForm, setShowForm] = useState(false);
   const [busy, setBusy] = useState(false);
   const visibleBooks =
     filter === "all" ? books : books.filter((book) => book.status === filter);
+
+  if (firebaseUnavailable) {
+    return (
+      <EmptyState
+        title="Firebase not configured"
+        text="This deployment is missing Firebase keys. Add the project values, then redeploy."
+        action={
+          <Link className="button primary" to="/">
+            Back home
+          </Link>
+        }
+      />
+    );
+  }
 
   async function addBook(event) {
     event.preventDefault();
@@ -844,6 +910,7 @@ function Library({ user, notify }) {
 function ReadingPage({ user, notify }) {
   const { bookId } = useParams();
   const [book, setBook] = useState(null);
+  const firebaseUnavailable = !db;
   const [readings, setReadings] = useState([]);
   const [activeReading, setActiveReading] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -853,6 +920,7 @@ function ReadingPage({ user, notify }) {
   const [complete, setComplete] = useState(false);
 
   const refresh = useCallback(async () => {
+    if (!db || !user?.uid || !bookId) return;
     const bookSnapshot = await getDoc(
       doc(db, "users", user.uid, "books", bookId),
     );
@@ -878,11 +946,31 @@ function ReadingPage({ user, notify }) {
   }, [bookId, user.uid]);
 
   useEffect(() => {
+    if (!db || !user?.uid || !bookId) {
+      setBook(null);
+      setLoading(false);
+      return;
+    }
+
     refresh().catch((error) => {
       notify(errorText(error));
       setLoading(false);
     });
-  }, [refresh, notify]);
+  }, [refresh, notify, user?.uid, bookId]);
+
+  if (firebaseUnavailable) {
+    return (
+      <EmptyState
+        title="Firebase not configured"
+        text="This deployment is missing Firebase keys. Add the project values, then redeploy."
+        action={
+          <Link className="button primary" to="/library">
+            Back to my library
+          </Link>
+        }
+      />
+    );
+  }
 
   async function submitPage(event) {
     event.preventDefault();
