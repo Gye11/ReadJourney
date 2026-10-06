@@ -329,6 +329,15 @@ function AuthPage({ mode, notify }) {
           </div>
         </form>
       </section>
+      <aside className="auth-art" aria-hidden="true">
+        <img
+          className="phone-preview"
+          src={phonePreview}
+          alt=""
+          width="411"
+          height="656"
+        />
+      </aside>
       <Link className="auth-back" to="/">
         ← Back to home
       </Link>
