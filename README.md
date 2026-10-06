@@ -32,7 +32,7 @@ npm run build
 npm run preview
 ```
 
-The production build is written to `dist/` and uses `/Read.Journey/` as its deployment base path. Local Firebase settings belong in `.env.local`; deployment environments must define the same `VITE_FIREBASE_*` variables.
+The production build is written to `dist/` and uses `/ReadJourney/` as its deployment base path. Local Firebase settings belong in `.env.local`; deployment environments must define the same `VITE_FIREBASE_*` variables.
 
 ## Deploy to GitHub Pages
 

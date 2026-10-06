@@ -14,7 +14,7 @@ function collectFiles(directory, prefix = "") {
 }
 
 export default defineConfig({
-  base: "/Read.Journey/",
+  base: "/ReadJourney/",
   publicDir: false,
   build: {
     emptyOutDir: true,

@@ -31,7 +31,7 @@ import {
 } from "react-router-dom";
 import { auth, db } from "./firebase.ts";
 
-const defaultCover = "/Read.Journey/assets/book-C2aK6_m4.jpg";
+const defaultCover = "/ReadJourney/assets/book-C2aK6_m4.jpg";
 const booksPath = (uid) => collection(db, "users", uid, "books");
 const readingsPath = (uid, bookId) =>
   collection(db, "users", uid, "books", bookId, "readings");
@@ -310,7 +310,7 @@ function AuthPage({ mode, notify }) {
 function Brand() {
   return (
     <Link to="/" className="brand">
-      <img className="brand-logo" src="/Read.Journey/Logo-1.svg" alt="" />
+      <img className="brand-logo" src="/ReadJourney/Logo-1.svg" alt="" />
       <span>READ JOURNEY</span>
     </Link>
   );
@@ -507,7 +507,9 @@ function Recommended({ user, notify }) {
           />
         </label>
         <div className="filter-actions">
-          <button className="button primary" type="submit">To apply</button>
+          <button className="button primary" type="submit">
+            To apply
+          </button>
           <span className="result-count" aria-live="polite">
             {filtered.length} {filtered.length === 1 ? "book" : "books"}
           </span>
@@ -582,19 +584,40 @@ function Recommended({ user, notify }) {
           </div>
           <label>
             Book title
-            <input name="title" placeholder="The Hobbit" required maxLength="160" />
+            <input
+              name="title"
+              placeholder="The Hobbit"
+              required
+              maxLength="160"
+            />
           </label>
           <label>
             Author
-            <input name="author" placeholder="J. R. R. Tolkien" required maxLength="120" />
+            <input
+              name="author"
+              placeholder="J. R. R. Tolkien"
+              required
+              maxLength="120"
+            />
           </label>
           <label>
             Total pages
-            <input name="totalPages" type="number" min="1" max="100000" placeholder="310" required />
+            <input
+              name="totalPages"
+              type="number"
+              min="1"
+              max="100000"
+              placeholder="310"
+              required
+            />
           </label>
           <label className="wide-field">
             Cover image URL <span className="optional">optional</span>
-            <input name="coverUrl" type="url" placeholder="https://example.com/cover.jpg" />
+            <input
+              name="coverUrl"
+              type="url"
+              placeholder="https://example.com/cover.jpg"
+            />
           </label>
           <button className="button primary" disabled={busyId === "manual"}>
             {busyId === "manual" ? "Saving…" : "Add to my library"}
