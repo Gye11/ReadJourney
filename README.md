@@ -34,6 +34,12 @@ npm run preview
 
 The production build is written to `dist/` and uses `/Read.Journey/` as its deployment base path. Local Firebase settings belong in `.env.local`; deployment environments must define the same `VITE_FIREBASE_*` variables.
 
+## Deploy to GitHub Pages
+
+The workflow at `.github/workflows/deploy.yml` builds and deploys `dist/` whenever changes are pushed to `main`; it can also be started manually from the repository's Actions tab. In repository Settings → Pages, set the build/deployment source to **GitHub Actions**.
+
+Before the first deployment, add these six `VITE_FIREBASE_*` values under Settings → Secrets and variables → Actions → Variables (or Secrets): `API_KEY`, `AUTH_DOMAIN`, `PROJECT_ID`, `STORAGE_BUCKET`, `MESSAGING_SENDER_ID`, and `APP_ID`. The workflow accepts either repository variables or secrets. Firebase web-app configuration is included in the public client bundle; never add a Firebase service-account key here. Add `gizemnuravci.github.io` (or the repository's actual Pages hostname) to Firebase Authentication → Settings → Authorized domains.
+
 ## Firebase data model
 
 - `catalog/{bookId}`: shared recommendation documents. Signed-in users can read them; clients cannot write to the catalog.
