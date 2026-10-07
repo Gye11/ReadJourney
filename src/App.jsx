@@ -33,6 +33,71 @@ import { auth, db, isFirebaseConfigured } from "./firebase.ts";
 import phonePreview from "../assets/phone-preview-DOP5Nxe_.png";
 
 const defaultCover = "/ReadJourney/assets/book-C2aK6_m4.jpg";
+const featuredBooks = [
+  {
+    id: "featured-gatsby",
+    title: "The Great Gatsby",
+    author: "F. Scott Fitzgerald",
+    totalPages: 180,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780743273565-M.jpg",
+  },
+  {
+    id: "featured-pride-prejudice",
+    title: "Pride and Prejudice",
+    author: "Jane Austen",
+    totalPages: 279,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780141439518-M.jpg",
+  },
+  {
+    id: "featured-1984",
+    title: "1984",
+    author: "George Orwell",
+    totalPages: 328,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780451524935-M.jpg",
+  },
+  {
+    id: "featured-mockingbird",
+    title: "To Kill a Mockingbird",
+    author: "Harper Lee",
+    totalPages: 336,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780061120084-M.jpg",
+  },
+  {
+    id: "featured-frankenstein",
+    title: "Frankenstein",
+    author: "Mary Shelley",
+    totalPages: 280,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780141439471-M.jpg",
+  },
+  {
+    id: "featured-crime-punishment",
+    title: "Crime and Punishment",
+    author: "Fyodor Dostoevsky",
+    totalPages: 671,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780140449136-M.jpg",
+  },
+  {
+    id: "featured-moby-dick",
+    title: "Moby-Dick",
+    author: "Herman Melville",
+    totalPages: 720,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780142437179-M.jpg",
+  },
+  {
+    id: "featured-brothers-karamazov",
+    title: "The Brothers Karamazov",
+    author: "Fyodor Dostoevsky",
+    totalPages: 824,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780140449266-M.jpg",
+  },
+  {
+    id: "featured-dorian-gray",
+    title: "The Picture of Dorian Gray",
+    author: "Oscar Wilde",
+    totalPages: 254,
+    coverUrl: "https://covers.openlibrary.org/b/isbn/9780141439570-M.jpg",
+  },
+];
 const booksPath = (uid) => collection(db, "users", uid, "books");
 const readingsPath = (uid, bookId) =>
   collection(db, "users", uid, "books", bookId, "readings");
@@ -245,7 +310,9 @@ function AuthPage({ mode, notify }) {
           <Brand />
           <div className="welcome-copy">
             <h1>
-              Expand your mind, reading <span>a book</span>
+              Expand your mind,
+              <br />
+              reading <span>a book</span>
             </h1>
             <div className="welcome-actions">
               <Link className="button primary" to="/register">
@@ -274,7 +341,9 @@ function AuthPage({ mode, notify }) {
       <section className="auth-card">
         <Brand />
         <h1 className="auth-title">
-          Expand your mind, reading <span>a book</span>
+          Expand your mind,
+          <br />
+          reading <span>a book</span>
         </h1>
         <form className="auth-form" onSubmit={submit}>
           {register && (
@@ -457,12 +526,17 @@ function Recommended({ user, notify }) {
     }
 
     getDocs(query(collection(db, "catalog"), limit(60)))
-      .then((result) =>
-        setCatalog(
-          result.docs.map((item) => ({ id: item.id, ...item.data() })),
-        ),
-      )
-      .catch((error) => notify(errorText(error)))
+      .then((result) => {
+        const firestoreBooks = result.docs.map((item) => ({
+          id: item.id,
+          ...item.data(),
+        }));
+        setCatalog(firestoreBooks.length ? firestoreBooks : featuredBooks);
+      })
+      .catch((error) => {
+        setCatalog(featuredBooks);
+        notify(errorText(error));
+      })
       .finally(() => setLoading(false));
   }, [notify]);
 
@@ -609,7 +683,7 @@ function Recommended({ user, notify }) {
           }
         />
       ) : (
-        <div className="book-grid">
+        <div className="book-grid recommended-grid">
           {filtered.map((book) => (
             <article className="book-card" key={book.id}>
               <Link className="cover-wrap" to="/library">

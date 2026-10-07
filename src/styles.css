@@ -1259,8 +1259,15 @@ input:focus-visible {
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap: 11px;
   }
+  .book-grid.recommended-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 10px;
+  }
   .cover-wrap > img {
     height: clamp(165px, 58vw, 240px);
+  }
+  .recommended-grid .cover-wrap > img {
+    height: clamp(135px, 39vw, 170px);
   }
   .book-info {
     padding: 11px;
