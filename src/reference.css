@@ -85,6 +85,7 @@ body {
 }
 .welcome-copy h1 span,
 .auth-title span {
+  display: block;
   color: #858585;
 }
 .welcome-actions {
