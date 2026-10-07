@@ -310,9 +310,9 @@ function AuthPage({ mode, notify }) {
           <Brand />
           <div className="welcome-copy">
             <h1>
-              Expand your mind,
+              Expand your
               <br />
-              reading <span>a book</span>
+              mind, reading <span>a book</span>
             </h1>
             <div className="welcome-actions">
               <Link className="button primary" to="/register">
@@ -341,9 +341,9 @@ function AuthPage({ mode, notify }) {
       <section className="auth-card">
         <Brand />
         <h1 className="auth-title">
-          Expand your mind,
+          Expand your
           <br />
-          reading <span>a book</span>
+          mind, reading <span>a book</span>
         </h1>
         <form className="auth-form" onSubmit={submit}>
           {register && (
